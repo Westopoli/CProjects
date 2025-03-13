@@ -39,6 +39,8 @@ int main()
     return 0;
 }
 
+// blah
+
 int number_of_common_vowels(char *s1, char *s2)
 {
     int count = 0;
