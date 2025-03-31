@@ -40,7 +40,7 @@ void convert(char *input, char *output)
 {
 	char *indexPointer;
 	char *outputPointer = output;
-	int digits;
+	int digits = 0;
 
 	// This for loop goes through every character the user input, and adds associated nummerical values to the output array
 	for(indexPointer = input; *indexPointer != '\0'; indexPointer++)
