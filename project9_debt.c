@@ -20,6 +20,7 @@ void search_list(struct debt *list);
 void print_list(struct debt *list);
 void clear_list(struct debt *list);
 int read_line(char str[], int n);
+struct debt *delete(struct debt *list);
 
 /**********************************************************
  * main: Prompts the user to enter an operation code,     *
@@ -33,8 +34,8 @@ int main(void)
   char code;
 
   struct debt *debt_list = NULL;  
-  printf("Operation Code: a for adding to the list, s for searching"
-	  ", p for printing the list; q for quit.\n");
+  printf("Operation Code: a for adding to the list, d for deleting the first debt, "
+    "s for searching, p for printing the list; q for quit.\n");
   for (;;) {
     printf("Enter operation code: ");
     scanf(" %c", &code);
@@ -42,6 +43,8 @@ int main(void)
       ;
     switch (code) {
       case 'a': debt_list = add_to_list(debt_list);
+                break;
+      case 'd': debt_list = delete(debt_list);
                 break;
       case 's': search_list(debt_list);
                 break;
@@ -60,11 +63,8 @@ int main(void)
  **********************************************************/
 struct debt *add_to_list(struct debt *list)
 {
-  // Two pointers are needed to add a new node to the end of the list
-  struct debt *new_node;
-  struct debt *current;
+  struct debt *new_node, *current, *previous;
   
-  // Allocates memory for the new node and check for success
   new_node = malloc(sizeof(struct debt));
   if (new_node == NULL) {
     printf("malloc failed in add_to_list\n");
@@ -86,15 +86,25 @@ struct debt *add_to_list(struct debt *list)
     return new_node;
   }
 
-  // Traverses the list to find the last node
-  current = list;
-  while (current->next != NULL) {
-    current = current->next;
-  }
+  // Searches for the correct position to insert the new node
+  for(previous = NULL, current = list; current != NULL && 
+    new_node->interest_rate <= current->interest_rate;
+  previous = current, current = current->next);
 
-  // Appends the new node to the end of the list
-  current->next = new_node;
-  return list;
+  // If this entry is the first entry, the new node becomes the head
+  if(previous == NULL)
+	{
+		new_node->next = current;
+		return new_node;
+	}
+
+  // Otherwise, insert the new node in the position found by the for loop 
+	else
+	{
+		new_node->next = current;
+		previous->next = new_node;
+		return list;
+	}
 }
 
 /**********************************************************
@@ -126,6 +136,28 @@ void search_list(struct debt *list)
     }
   if (flag == 0)
     printf("not found\n");
+}
+
+/**********************************************************
+ * delete_from_list: Deletes a node from the list.        *
+ *                   Returns a pointer to the head of the *
+ *                   list. If the list is empty, it       *
+ *                   returns NULL.                        *
+ **********************************************************/
+struct debt *delete(struct debt *list)
+{
+	struct debt *prev, *curr;
+
+	for(prev = NULL, curr = list; curr == NULL; prev = curr, curr = curr->next);
+	
+	if(curr == NULL) 
+		return list; 
+	if(prev == NULL)
+		list = list->next; 
+	else
+		prev->next = curr->next;
+	free(curr);
+	return list; 
 }
 
 /**********************************************************
